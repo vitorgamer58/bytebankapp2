@@ -5,9 +5,14 @@ import 'package:bytebank2/models/contact.dart';
 import 'package:bytebank2/screens/contact_form.dart';
 import 'package:flutter/material.dart';
 
-class ContactsList extends StatelessWidget {
+class ContactsList extends StatefulWidget {
   //final List<Contact> contacts = [];
 
+  @override
+  _ContactsListState createState() => _ContactsListState();
+}
+
+class _ContactsListState extends State<ContactsList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +37,6 @@ class ContactsList extends StatelessWidget {
                   ],
                 ),
               );
-              break;
             case ConnectionState.active:
               break;
             case ConnectionState.done:
@@ -44,7 +48,6 @@ class ContactsList extends StatelessWidget {
                 },
                 itemCount: contacts!.length,
               );
-              break;
           }
           return Text('Null');
         },
@@ -56,11 +59,7 @@ class ContactsList extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => ContactForm(),
                 ),
-              )
-              .then(
-                // Need to use setState
-                (newContact) => debugPrint('$newContact'),
-              );
+              ).then((value) => setState(() {} ));
         },
         child: Icon(Icons.add),
       ),
