@@ -1,3 +1,4 @@
+import 'package:bytebank2/http/webclient.dart';
 import 'package:bytebank2/screens/contacts_list.dart';
 import 'package:bytebank2/screens/transactions_list.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +40,7 @@ class Dashboard extends StatelessWidget {
                     'Transaction feed',
                     Icons.description,
                     onClick: () {
+                      findAll();
                       print('Transaction feed was clicked');
                     },
                   )

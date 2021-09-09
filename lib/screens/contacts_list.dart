@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:bytebank2/dao/contact_dao.dart';
 import 'package:bytebank2/models/contact.dart';
 import 'package:bytebank2/screens/contact_form.dart';
+import 'package:bytebank2/screens/transaction_form.dart';
 import 'package:flutter/material.dart';
 
 class ContactsList extends StatefulWidget {
@@ -23,7 +24,8 @@ class _ContactsListState extends State<ContactsList> {
       ),
       body: FutureBuilder<List<Contact>>(
         initialData: [],
-        future: Future.delayed(Duration(seconds: 1)).then((value) => _dao.findAll()),
+        future: Future.delayed(Duration(seconds: 1))
+            .then((value) => _dao.findAll()),
         builder: (context, AsyncSnapshot<List<Contact>> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -47,7 +49,15 @@ class _ContactsListState extends State<ContactsList> {
               return ListView.builder(
                 itemBuilder: (context, index) {
                   final contact = contacts![index];
-                  return _ContactItem(contact);
+                  return _ContactItem(
+                    contact,
+                    onClick: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => TransactionForm(contact)),
+                      );
+                    },
+                  );
                 },
                 itemCount: contacts!.length,
               );
@@ -63,7 +73,8 @@ class _ContactsListState extends State<ContactsList> {
                 MaterialPageRoute(
                   builder: (context) => ContactForm(),
                 ),
-              ).then((value) => setState(() {} ));
+              )
+              .then((value) => setState(() {}));
         },
         child: Icon(Icons.add),
       ),
@@ -73,12 +84,17 @@ class _ContactsListState extends State<ContactsList> {
 
 class _ContactItem extends StatelessWidget {
   final Contact contact;
-  _ContactItem(this.contact);
+  final Function onClick;
+  _ContactItem(
+    this.contact, {
+    required this.onClick,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
+        onTap: () => onClick(),
         title: Text(
           contact.name,
           style: TextStyle(fontSize: 24.0),
