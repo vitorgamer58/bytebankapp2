@@ -4,6 +4,7 @@ import 'package:bytebank2/http/webclient.dart';
 import 'package:bytebank2/models/contact.dart';
 import 'package:bytebank2/models/transaction.dart';
 import 'package:http/http.dart';
+import 'package:bytebank2/http/webclient.dart';
 
 class TransactionWebClient {
   Future<List<Transaction>> findAll() async {
@@ -14,15 +15,23 @@ class TransactionWebClient {
     //print('decodedJson $decodedJson');
   }
 
-  Future<Transaction> save(Transaction transaction) async {
+  Future<Transaction> save(Transaction transaction, String password) async {
 
     Map<String, dynamic> transactionMap = _toMap(transaction);
     final String transactionJson = jsonEncode(transactionMap);
 
-    final Response response = await client.post(Uri.parse('http://25.38.175.28:8080/transactions'), headers: {
+    final Response response = await client.post(Uri.parse('http://192.168.0.115:8080/transactions'), headers: {
       'Content-type': 'application/json',
-      'password': '1000',
+      'password': password,
     }, body: transactionJson);
+
+    if (response.statusCode == 400) {
+      throw Exception('Ocorreu um erro 400');
+    }
+
+    if (response.statusCode == 401) {
+      throw Exception('authentication failed');
+    }
 
     return _toTransaction(response);
 

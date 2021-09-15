@@ -1,3 +1,4 @@
+import 'package:bytebank2/components/transaction_auth_dialog.dart';
 import 'package:bytebank2/http/webclient.dart';
 import 'package:bytebank2/screens/dashboard.dart';
 import 'package:flutter/material.dart';
