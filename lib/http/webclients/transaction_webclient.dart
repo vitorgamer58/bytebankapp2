@@ -25,16 +25,21 @@ class TransactionWebClient {
       'password': password,
     }, body: transactionJson);
 
-    if (response.statusCode == 400) {
-      throw Exception('Ocorreu um erro 400');
+    if(response.statusCode == 200) {
+      return _toTransaction(response);
     }
 
-    if (response.statusCode == 401) {
-      throw Exception('authentication failed');
-    }
+    _throwHttpError(response.statusCode);
 
-    return _toTransaction(response);
+    throw Exception('unknown'); // The body might complete normally, causing 'null' to be returned, but the return type is a potentially non-nullable type.
 
+  }
+
+  void _throwHttpError(int statusCode) => throw Exception(_statusCodeResponses[statusCode]);
+
+  static final Map<int, String> _statusCodeResponses = {
+    400 : 'Ocorreu um erro 400',
+    401 : 'authentication failed'
   }
 
   List<Transaction> _toTransactions(Response response) {
