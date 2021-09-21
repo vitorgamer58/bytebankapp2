@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bytebank2/components/response_dialog.dart';
 import 'package:bytebank2/components/transaction_auth_dialog.dart';
 import 'package:bytebank2/http/webclient.dart';
@@ -5,6 +7,7 @@ import 'package:bytebank2/http/webclients/transaction_webclient.dart';
 import 'package:bytebank2/models/contact.dart';
 import 'package:bytebank2/models/transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class TransactionForm extends StatefulWidget {
   final Contact contact;
@@ -18,6 +21,7 @@ class TransactionForm extends StatefulWidget {
 class _TransactionFormState extends State<TransactionForm> {
   final TextEditingController _valueController = TextEditingController();
   final TransactionWebClient _webClient = TransactionWebClient();
+  final String transactionId = Uuid().v4();
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +90,7 @@ class _TransactionFormState extends State<TransactionForm> {
                             });
                       }
                       final transactionCreated =
-                          Transaction(value!, widget.contact);
+                          Transaction(transactionId, value!, widget.contact);
                       showDialog(
                           context: context,
                           builder: (contextDialog) {
@@ -109,6 +113,15 @@ class _TransactionFormState extends State<TransactionForm> {
 
   void _save(Transaction transactionCreated, String password,
       BuildContext context) async {
+    await _send(
+      transactionCreated,
+      password,
+      context,
+    );
+  }
+
+  Future<void> _send(Transaction transactionCreated, String password,
+      BuildContext context) async {
     await Future.delayed((Duration(seconds: 1)));
     _webClient.save(transactionCreated, password).then((transactionReceived) {
       showDialog(
@@ -116,13 +129,26 @@ class _TransactionFormState extends State<TransactionForm> {
           builder: (contextDialog) {
             return SuccessDialog('sucessful transaction');
           }).then((value) => Navigator.pop(context));
-    }).catchError((err) {
+    }).catchError((e) {
+      _showFailureMessage(context,
+          message:
+              'Timeout, o sistema está fora do ar ou você está sem conexão com a internet');
+    }, test: (e) => e is TimeoutException).catchError((err) {
       print('Ocorreu um erro $err');
-      showDialog(
-          context: context,
-          builder: (contextDialog) {
-            return FailureDialog(err.message);
-          });
-    }, test: (err) => err is Exception);
+      _showFailureMessage(context, message: err.message);
+    }, test: (err) => err is HttpException).catchError((err) {
+      // Se não for um TimeoutException ou HttpException -> então cai no erro desconhecido!
+      // O erro desconecido é algo inesperado!
+      _showFailureMessage(context);
+    });
+  }
+
+  void _showFailureMessage(BuildContext context,
+      {String message = 'Unknown Error'}) {
+    showDialog(
+        context: context,
+        builder: (contextDialog) {
+          return FailureDialog(message);
+        });
   }
 }
