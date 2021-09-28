@@ -6,6 +6,7 @@ import 'package:bytebank2/http/webclient.dart';
 import 'package:bytebank2/http/webclients/transaction_webclient.dart';
 import 'package:bytebank2/models/contact.dart';
 import 'package:bytebank2/models/transaction.dart';
+import 'package:bytebank2/widgets/progress.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -22,6 +23,7 @@ class _TransactionFormState extends State<TransactionForm> {
   final TextEditingController _valueController = TextEditingController();
   final TransactionWebClient _webClient = TransactionWebClient();
   final String transactionId = Uuid().v4();
+  bool _sending = false;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,15 @@ class _TransactionFormState extends State<TransactionForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              Visibility(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Progress(
+                    message: 'Sending...',
+                  ),
+                ),
+                visible: _sending,
+              ),
               Text(
                 widget.contact.name,
                 style: TextStyle(
@@ -113,16 +124,22 @@ class _TransactionFormState extends State<TransactionForm> {
 
   void _save(Transaction transactionCreated, String password,
       BuildContext context) async {
+    setState(() {
+      _sending = true;
+    });
     await _send(
       transactionCreated,
       password,
       context,
     );
+    // setState(() {
+    //   _sending = false;
+    // });
   }
 
   Future<void> _send(Transaction transactionCreated, String password,
       BuildContext context) async {
-    await Future.delayed((Duration(seconds: 1)));
+    await Future.delayed((Duration(seconds: 2)));
     _webClient.save(transactionCreated, password).then((transactionReceived) {
       showDialog(
           context: context,
@@ -139,7 +156,11 @@ class _TransactionFormState extends State<TransactionForm> {
     }, test: (err) => err is HttpException).catchError((err) {
       // Se não for um TimeoutException ou HttpException -> então cai no erro desconhecido!
       // O erro desconecido é algo inesperado!
-      _showFailureMessage(context);
+      _showFailureMessage(context, message: 'Unknown Error');
+    }).whenComplete(() {
+      setState(() {
+        _sending = false;
+      });
     });
   }
 
