@@ -139,7 +139,7 @@ class _TransactionFormState extends State<TransactionForm> {
 
   Future<void> _send(Transaction transactionCreated, String password,
       BuildContext context) async {
-    await Future.delayed((Duration(seconds: 2)));
+    await Future.delayed((Duration(seconds: 1)));
     _webClient.save(transactionCreated, password).then((transactionReceived) {
       showDialog(
           context: context,

@@ -1,17 +1,21 @@
 import 'package:bytebank2/components/transaction_auth_dialog.dart';
 import 'package:bytebank2/http/webclient.dart';
+import 'package:bytebank2/models/saldo.dart';
 import 'package:bytebank2/screens/dashboard.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import 'components/saldo.dart';
 import 'models/contact.dart';
 import 'models/transaction.dart';
 
 
 void main() {
-  runApp(BytebankApp());
-  //save(Transaction(200.0, Contact(0, 'Joao', 2000))).then((transaction) => print(transaction));
-  //findAll().then((transactions) => print('new transactions $transactions'));
+  runApp(ChangeNotifierProvider(
+    create: (context) => Saldo(0),
+    child: BytebankApp(),
+  ));
 }
 
 class BytebankApp extends StatelessWidget {

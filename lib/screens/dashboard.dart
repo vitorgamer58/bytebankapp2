@@ -1,11 +1,14 @@
+import 'package:bytebank2/components/saldo.dart';
 import 'package:bytebank2/http/webclient.dart';
 import 'package:bytebank2/http/webclients/transaction_webclient.dart';
+import 'package:bytebank2/models/saldo.dart';
 import 'package:bytebank2/screens/contacts_list.dart';
+import 'package:bytebank2/screens/deposito.dart';
 import 'package:bytebank2/screens/transactions_list.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Dashboard extends StatelessWidget {
-
   final TransactionWebClient _webClient = TransactionWebClient();
 
   @override
@@ -17,12 +20,31 @@ class Dashboard extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             //Image.network('https://imgr.search.brave.com/unILmJy79E7kr0bWh3tOZPIjvhVv0TypOiGLM_FuVBo/fit/480/324/no/1/aHR0cHM6Ly9jZG4u/c2hvcGlmeS5jb20v/cy9maWxlcy8xLzA3/NDIvOTgzMS9wcm9k/dWN0cy9BbmNhcF9m/bGFnX2RpZ2l0YWxf/bGFyZ2UucG5nP3Y9/MTQ5MjY1NzI1Ng')
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Image.asset('images/bytebank_logo.png'),
+              child: Column(
+                children: [
+                  Container(
+                    child: Image.asset('images/bytebank_logo.png'),
+                    height: 300,
+                    width: 300,
+                  ),
+                  SaldoCard(),
+                  Consumer<Saldo>(
+                    builder: (context, saldo, child) {
+                      return ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => FormularioDeposito()));
+                          },
+                          child: Text('Depósito'));
+                    },
+                  )
+                ],
+              ),
             ),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -58,9 +80,9 @@ class Dashboard extends StatelessWidget {
   }
 
   void _showTransactionsList(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => TransactionsList(),)
-    );
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => TransactionsList(),
+    ));
   }
 }
 
