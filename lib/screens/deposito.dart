@@ -1,10 +1,24 @@
+import 'package:bytebank2/models/saldo.dart';
 import 'package:bytebank2/models/transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:bytebank2/components/response_dialog.dart';
+import 'package:bytebank2/components/transaction_auth_dialog.dart';
+import 'package:bytebank2/http/webclient.dart';
+import 'package:bytebank2/http/webclients/transaction_webclient.dart';
+import 'package:bytebank2/models/contact.dart';
+import 'package:bytebank2/models/transaction.dart';
+import 'package:bytebank2/widgets/progress.dart';
+import 'package:provider/provider.dart';
 
 const _tituloAppBar = 'Depósito';
 const _dicaCampoValor = '0.00';
 
-class FormularioDeposito extends StatelessWidget {
+class FormularioDeposito extends StatefulWidget {
+  @override
+  _FormularioDepositoState createState() => _FormularioDepositoState();
+}
+
+class _FormularioDepositoState extends State<FormularioDeposito> {
   final TextEditingController _valueController = TextEditingController();
 
   @override
@@ -48,10 +62,6 @@ class FormularioDeposito extends StatelessWidget {
                       final double? value =
                           double.tryParse(_valueController.text);
                       if (value == null) {
-                        // Protege a API de uma entrada inválida, como um valor null.
-                        // Existe o null check no flutter >2.0.0
-                        // Portanto, sem esse IF o erro seria de nullcheck, não chegaria a bater na API
-                        // Mas ficaria sem resposta para o usuário.
                         showDialog(
                           context: context,
                           builder: (contextDialog) {
@@ -61,25 +71,15 @@ class FormularioDeposito extends StatelessWidget {
                                   'O valor da transação não pode ser vazio!'),
                               actions: [
                                 TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text('Entendido'))
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text('Entendido'),
+                                )
                               ],
                             );
                           },
                         );
                       }
-                      // final transactionCreated =
-                      //     Transaction(transactionId, value!, widget.contact);
-                      // showDialog(
-                      //   context: context,
-                      //   builder: (contextDialog) {
-                      //     return TransactionAuthDialog(
-                      //       onConfirm: (String password) {
-                      //         _save(transactionCreated, password, context);
-                      //       },
-                      //     );
-                      //   },
-                      // );
+                      _criaDeposito(context, value);
                     },
                   ),
                 ),
@@ -90,4 +90,10 @@ class FormularioDeposito extends StatelessWidget {
       ),
     );
   }
+}
+
+void _criaDeposito(BuildContext context, value) {
+  Provider.of<Saldo>(context, listen: false).adiciona(value);
+
+  Navigator.pop(context);
 }

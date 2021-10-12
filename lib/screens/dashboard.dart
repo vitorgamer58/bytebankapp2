@@ -33,16 +33,12 @@ class Dashboard extends StatelessWidget {
                     width: 300,
                   ),
                   SaldoCard(),
-                  Consumer<Saldo>(
-                    builder: (context, saldo, child) {
-                      return ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => FormularioDeposito()));
-                          },
-                          child: Text('Depósito'));
-                    },
-                  )
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => FormularioDeposito()));
+                      },
+                      child: Text('Depósito')),
                 ],
               ),
             ),
